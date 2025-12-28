@@ -1,0 +1,348 @@
+@import "tailwindcss";
+
+:root {
+  /* Light Theme Colors */
+  --bg-primary: #ffffff;
+  --text-primary: #000000;
+
+  --color-correct: #6aaa64;
+  --color-present: #c9b458;
+  --color-absent: #787c7e;
+
+  /* Tile Colors */
+  --tile-bg-empty: transparent;
+  --tile-border-empty: #d3d6da;
+  --tile-border-filled: #878a8c;
+  --tile-text-filled: #000000;
+
+  /* Key Colors */
+  --key-bg-default: #d3d6da;
+  --key-bg-hover: #b5babf;
+
+  /* Responsive Sizing */
+  --header-height: 3.5rem;
+  /* 56px */
+  /* Allow tiles to shrink on small screens */
+  --tile-size: clamp(3rem, 7vh, 4rem);
+  --tile-gap: clamp(4px, 0.5vh, 6px);
+  /* Key height needs to scale to avoid overflow */
+  --key-height: clamp(2.8rem, 6vh, 3.5rem);
+}
+
+@media (max-width: 480px) {
+  :root {
+    --tile-size: clamp(2.5rem, 8vh, 3.5rem);
+    --tile-gap: 4px;
+    --key-height: clamp(2.8rem, 7vh, 3.2rem);
+  }
+}
+
+/* Dark Theme Overrides */
+.dark {
+  --bg-primary: #121213;
+  --text-primary: #ffffff;
+
+  --color-correct: #538d4e;
+  --color-present: #b59f3b;
+  --color-absent: #3a3a3c;
+
+  --tile-border-empty: #3a3a3c;
+  --tile-border-filled: #565758;
+  --tile-text-filled: #ffffff;
+
+  --key-bg-default: #818384;
+  --key-bg-hover: #565758;
+}
+
+/* High Contrast Theme Overrides */
+body[data-high-contrast="true"] {
+  --color-correct: #85c0f9;
+  /* Orange */
+  --color-present: #f5793a;
+  /* Cyan */
+}
+
+body {
+  font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+@layer components {
+
+  /* --- Semantic Layout Classes --- */
+  .app-shell {
+    @apply flex flex-col w-full overflow-hidden transition-colors;
+    height: 100dvh;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+
+  .app-header {
+    @apply flex-none grid items-center w-full max-w-lg mx-auto px-4 relative z-10 border-b;
+    grid-template-columns: 1fr auto 1fr;
+    height: var(--header-height);
+    border-color: #d1d5db;
+    /* gray-300 */
+  }
+
+  .dark .app-header {
+    border-color: #4b5563;
+    /* gray-600 */
+  }
+
+  .app-main {
+    @apply flex-1 flex flex-col items-center justify-center overflow-hidden relative w-full;
+  }
+
+  .app-footer {
+    @apply flex-none w-full mt-auto z-10 transition-colors;
+    padding-bottom: env(safe-area-inset-bottom);
+    background-color: var(--bg-primary);
+  }
+
+  /* --- UI Components --- */
+  .icon-btn {
+    @apply text-xl font-bold p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors;
+  }
+
+  .mode-pill {
+    @apply text-xs font-bold p-2 bg-gray-200 dark:bg-gray-700 rounded uppercase whitespace-nowrap hover:opacity-80 transition-opacity;
+  }
+
+  .toast-message {
+    @apply absolute left-1/2 z-20 bg-black text-white px-5 py-3 rounded font-bold shadow-lg whitespace-nowrap;
+    top: 10%;
+    transform: translateX(-50%);
+  }
+
+  /* --- Overlays / Panels --- */
+  .play-again-panel {
+    @apply flex flex-col items-center gap-2 mt-4 absolute bottom-4 z-20 p-4 rounded shadow-lg border;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-color: #e5e7eb;
+    /* gray-200 */
+    animation: fade-in 0.5s ease-out forwards;
+  }
+
+  .dark .play-again-panel {
+    background-color: rgba(0, 0, 0, 0.9);
+    border-color: #1f2937;
+    /* gray-800 */
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 bg-green-600 text-white font-bold rounded shadow hover:bg-green-700 transition cursor-pointer;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-gray-500 text-white font-bold rounded shadow hover:bg-gray-600 transition cursor-pointer;
+  }
+
+  /* --- Game Grid --- */
+  .tile-base {
+    @apply border-2 flex items-center justify-center text-3xl font-bold uppercase select-none;
+    width: var(--tile-size);
+    height: var(--tile-size);
+  }
+
+  .tile-correct {
+    @apply text-white;
+    background-color: var(--color-correct);
+    border-color: var(--color-correct);
+  }
+
+  .tile-present {
+    @apply text-white;
+    background-color: var(--color-present);
+    border-color: var(--color-present);
+  }
+
+  .tile-absent {
+    @apply text-white;
+    background-color: var(--color-absent);
+    border-color: var(--color-absent);
+  }
+
+  .tile-empty {
+    border-color: var(--tile-border-empty);
+    background-color: var(--tile-bg-empty);
+  }
+
+  .tile-filled {
+    @apply border-2;
+    border-color: var(--tile-border-filled);
+    background-color: var(--tile-bg-empty);
+    color: var(--tile-text-filled);
+    animation: pop 0.1s;
+  }
+
+  /* --- Keyboard --- */
+  .key-btn {
+    @apply rounded font-bold uppercase cursor-pointer select-none flex items-center justify-center flex-1 transition-colors;
+    color: var(--text-primary);
+  }
+
+  .key-correct {
+    @apply text-white;
+    background-color: var(--color-correct);
+  }
+
+  .key-present {
+    @apply text-white;
+    background-color: var(--color-present);
+  }
+
+  .key-absent {
+    @apply text-white;
+    background-color: var(--color-absent);
+  }
+
+  .key-default {
+    background-color: var(--key-bg-default);
+    color: var(--text-primary);
+  }
+
+  .key-default:hover {
+    background-color: var(--key-bg-hover);
+  }
+
+  .key-special {
+    @apply text-sm font-bold;
+    background-color: var(--key-bg-default);
+    color: var(--text-primary);
+    flex: 1.5;
+  }
+
+  .dark .key-default,
+  .dark .key-special {
+    color: #ffffff;
+  }
+
+  /* --- Animations --- */
+  .animate-reveal-correct {
+    animation: reveal-correct 0.5s ease-in forwards;
+  }
+
+  .animate-reveal-present {
+    animation: reveal-present 0.5s ease-in forwards;
+  }
+
+  .animate-reveal-absent {
+    animation: reveal-absent 0.5s ease-in forwards;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes reveal-correct {
+  0% {
+    transform: rotateX(0);
+    background: transparent;
+    border-color: var(--tile-border-filled);
+    color: var(--tile-text-filled);
+  }
+
+  49.9% {
+    transform: rotateX(90deg);
+    background: transparent;
+    border-color: var(--tile-border-filled);
+    color: var(--tile-text-filled);
+  }
+
+  50% {
+    transform: rotateX(90deg);
+    background: var(--color-correct);
+    border-color: var(--color-correct);
+    color: white;
+  }
+
+  100% {
+    transform: rotateX(0);
+    background: var(--color-correct);
+    border-color: var(--color-correct);
+    color: white;
+  }
+}
+
+@keyframes reveal-present {
+  0% {
+    transform: rotateX(0);
+    background: transparent;
+    border-color: var(--tile-border-filled);
+    color: var(--tile-text-filled);
+  }
+
+  49.9% {
+    transform: rotateX(90deg);
+    background: transparent;
+    border-color: var(--tile-border-filled);
+    color: var(--tile-text-filled);
+  }
+
+  50% {
+    transform: rotateX(90deg);
+    background: var(--color-present);
+    border-color: var(--color-present);
+    color: white;
+  }
+
+  100% {
+    transform: rotateX(0);
+    background: var(--color-present);
+    border-color: var(--color-present);
+    color: white;
+  }
+}
+
+@keyframes reveal-absent {
+  0% {
+    transform: rotateX(0);
+    background: transparent;
+    border-color: var(--tile-border-filled);
+    color: var(--tile-text-filled);
+  }
+
+  49.9% {
+    transform: rotateX(90deg);
+    background: transparent;
+    border-color: var(--tile-border-filled);
+    color: var(--tile-text-filled);
+  }
+
+  50% {
+    transform: rotateX(90deg);
+    background: var(--color-absent);
+    border-color: var(--color-absent);
+    color: white;
+  }
+
+  100% {
+    transform: rotateX(0);
+    background: var(--color-absent);
+    border-color: var(--color-absent);
+    color: white;
+  }
+}

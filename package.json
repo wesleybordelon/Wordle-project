@@ -1,0 +1,36 @@
+{
+  "name": "wordle",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0",
+    "build": "next build",
+    "start": "next start -H 0.0.0.0",
+    "lint": "eslint",
+    "validate:words": "tsx scripts/validate-wordlists.ts",
+    "test": "tsx --test lib/**/*.test.ts",
+    "words:build": "node scripts/build-wordlists.mjs --in data/source/scowl.txt --out data --answers sample --n 2315",
+    "words:build:all": "node scripts/build-wordlists.mjs --in data/source/scowl.txt --out data --answers all",
+    "words:build:filtered": "node scripts/build-wordlists.mjs --in data/source/scowl.txt --out data --answers filtered",
+    "share": "concurrently \"npm run start\" \"cloudflared tunnel --url http://localhost:3000\"",
+    "share:dev": "concurrently \"npm run dev\" \"cloudflared tunnel --url http://localhost:3000\"",
+    "share:lt": "concurrently \"npm run start\" \"npx localtunnel --port 3000\""
+  },
+  "dependencies": {
+    "next": "16.1.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}
